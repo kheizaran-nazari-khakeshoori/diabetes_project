@@ -1,0 +1,21 @@
+# Python cache & temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Environments (Virtual Environments)
+.venv/
+venv/
+ENV/
+env/
+
+# Data files (We don't want to push data to Git)
+data/processed/*.npy
+data/processed/*_cleaned.csv
+
+# IDE settings
+.vscode/
+.idea/
