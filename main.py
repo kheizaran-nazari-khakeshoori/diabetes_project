@@ -1,18 +1,25 @@
-from pathlib import Path
-
+import os
 from src.data_cleaning import clean_data, load_data, save_cleaned_data
+from src.feature_scaling import scale_features
 
 
-RAW_DATA_PATH = Path("data/raw/diabetes.csv")
-CLEAN_DATA_PATH = Path("data/processed/diabetes_cleaned.csv")
-
-
-def main() -> None:
+def main():
+    # ۱. تعریف مسیرهای فایل‌ها و پوشه‌ها
+    RAW_DATA_PATH = os.path.join("data", "raw", "diabetes.csv")
+    PROCESSED_DIR_PATH = os.path.join("data", "processed")
+    CLEANED_DATA_PATH = os.path.join(PROCESSED_DIR_PATH, "diabetes_cleaned.csv")
+    
+    print("🚀 --- Starting Machine Learning Pipeline --- 🚀\n")
+    
+    # ۲. مرحله اول: تمیزکاری داده‌ها (Data Cleaning)
     raw_df = load_data(RAW_DATA_PATH)
     cleaned_df = clean_data(raw_df)
-    save_cleaned_data(cleaned_df, CLEAN_DATA_PATH)
-    print(f"Cleaned data saved to {CLEAN_DATA_PATH}")
-
+    save_cleaned_data(cleaned_df, CLEANED_DATA_PATH)
+    print("-" * 40)
+    
+    # ۳. مرحله دوم: مقیاس‌دهی ویژگی‌ها (Feature Scaling)
+    scale_features(CLEANED_DATA_PATH, PROCESSED_DIR_PATH)
+    print("\n🚀 --- Pipeline Executed Successfully! --- 🚀")
 
 if __name__ == "__main__":
     main()
