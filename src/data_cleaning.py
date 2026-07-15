@@ -1,70 +1,47 @@
-from __future__ import annotations
-
-from pathlib import Path
-
 import pandas as pd
+import numpy as np
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 
+def clean_data(raw_data_path, processed_dir_path):
+    print("Starting Data Preprocessing...")
+    
+    os.makedirs(processed_dir_path, exist_ok=True)
+    
+    # 1. Load dataset
+    df = pd.read_csv(raw_data_path)
+    print(f"Raw data loaded. Shape: {df.shape}")
 
-RAW_TO_STANDARD_COLUMNS = {
-    "preg": "pregnancies",
-    "plas": "glucose",
-    "pres": "blood_pressure",
-    "skin": "skin_thickness",
-    "insu": "insulin",
-    "mass": "bmi",
-    "pedi": "diabetes_pedigree_function",
-    "age": "age",
-    "class": "outcome",
-}
+    # 2. Encode target column
+    le = LabelEncoder()
+    df['class'] = le.fit_transform(df['class'])
+    print("Target column encoded successfully.")
 
-ZERO_AS_MISSING_COLUMNS = [
-    "glucose",
-    "blood_pressure",
-    "skin_thickness",
-    "insulin",
-    "bmi",
-]
+    # 3. Handle missing values (zeros)
+    columns_with_zero = ['plas', 'pres', 'skin', 'insu', 'mass']
+    for col in columns_with_zero:
+        df[col] = df[col].replace(0, np.nan)
+        df[col] = df[col].fillna(df[col].median())
+    print("Missing values (zeros) handled using Median Imputation.")
 
+    # 4. Separate features and target
+    X = df.drop(columns=['class'])
+    y = df['class']
 
-def load_data(file_path: str | Path) -> pd.DataFrame:
-    """Load the raw diabetes dataset from a CSV file."""
-    return pd.read_csv(file_path)
+    # 5. Train/Test Split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
+    # 6. Feature Scaling
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Clean the diabetes dataset into a more analysis-friendly shape."""
-    cleaned_df = df.copy()
-    cleaned_df.columns = [column.strip().lower().replace(" ", "_") for column in cleaned_df.columns]
-    cleaned_df = cleaned_df.rename(columns=RAW_TO_STANDARD_COLUMNS)
-    cleaned_df = cleaned_df.drop_duplicates()
+    # 7. Save processed data
+    np.save(os.path.join(processed_dir_path, 'X_train.npy'), X_train_scaled)
+    np.save(os.path.join(processed_dir_path, 'X_test.npy'), X_test_scaled)
+    np.save(os.path.join(processed_dir_path, 'y_train.npy'), y_train.values)
+    np.save(os.path.join(processed_dir_path, 'y_test.npy'), y_test.values)
+    df.to_csv(os.path.join(processed_dir_path, 'diabetes_cleaned.csv'), index=False)
 
-    if "outcome" in cleaned_df.columns:
-        cleaned_df["outcome"] = cleaned_df["outcome"].replace(
-            {"tested_positive": 1, "tested_negative": 0}
-        )
-
-    for column in ZERO_AS_MISSING_COLUMNS:
-        if column in cleaned_df.columns:
-            cleaned_df[column] = cleaned_df[column].replace(0, pd.NA)
-
-    numeric_columns = cleaned_df.select_dtypes(include="number").columns
-    categorical_columns = cleaned_df.select_dtypes(exclude="number").columns
-
-    for column in numeric_columns:
-        cleaned_df[column] = cleaned_df[column].fillna(cleaned_df[column].median())
-
-    for column in categorical_columns:
-        if not cleaned_df[column].dropna().empty:
-            cleaned_df[column] = cleaned_df[column].fillna(cleaned_df[column].mode().iloc[0])
-
-    if "outcome" in cleaned_df.columns:
-        cleaned_df["outcome"] = cleaned_df["outcome"].astype("Int64")
-
-    return cleaned_df
-
-
-def save_cleaned_data(df: pd.DataFrame, output_path: str | Path) -> None:
-    """Save the cleaned dataset to disk."""
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(output_path, index=False)
+    print("Preprocessing complete. Processed files saved in data/processed/")
