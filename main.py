@@ -3,6 +3,7 @@ from src.data_cleaning import clean_data, load_data, save_cleaned_data
 from src.feature_scaling import scale_features
 from src.feature_selection import select_features
 from src.model_training import train_models
+from src.final_evaluation import evaluate_models
 
 
 def main():
@@ -29,8 +30,12 @@ def main():
     
     # ۵. مرحله چهارم: آموزش مدل‌ها (Model Training)
     train_models(PROCESSED_DIR_PATH)
+    print("-" * 40)
     
-    print("\n🚀 --- Pipeline Executed Successfully! --- 🚀")
+    # ۶. مرحله پنجم: ارزیابی نهایی مدل‌ها (Model Evaluation)
+    evaluate_models(PROCESSED_DIR_PATH)
+    
+    print("\n🎉 --- Full Pipeline Executed Successfully! All Done! --- 🎉")
 
 if __name__ == "__main__":
     main()
