@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 def scale_features(cleaned_data_path, processed_dir_path):
-    print("⚖️ Starting Feature Scaling...")
+    print(" Starting Feature Scaling...")
 
     cleaned_data_path = Path(cleaned_data_path)
     processed_dir_path = Path(processed_dir_path)
@@ -39,8 +39,8 @@ def scale_features(cleaned_data_path, processed_dir_path):
     np.save(processed_dir_path / "y_train.npy", y_train.to_numpy())
     np.save(processed_dir_path / "y_test.npy", y_test.to_numpy())
 
-    print("[✓] Data split into Train/Test and scaled successfully.")
-    print(f"[✓] Saved scaled arrays in: {processed_dir_path}")
+    print(" Data split into Train/Test and scaled successfully.")
+    print(f" Saved scaled arrays in: {processed_dir_path}")
 
 
 if __name__ == "__main__":
