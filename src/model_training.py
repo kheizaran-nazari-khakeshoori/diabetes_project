@@ -6,30 +6,30 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 
 def train_models(processed_dir_path):
-    print("🏋️‍♂️ Starting Model Training...")
+    print("Starting Model Training...")
     
-    # ۱. بارگذاری داده‌های اسکیل‌شده و برچسب‌ها
+    # 1. Load scaled training data
     X_train = np.load(os.path.join(processed_dir_path, 'X_train_scaled.npy'))
     y_train = np.load(os.path.join(processed_dir_path, 'y_train.npy'))
     
-    # ۲. تعریف مدل Baseline (طبق مینی‌پروژه: پیش‌بینی رایج‌ترین کلاس)
+    # 2. Define baseline model
     baseline_model = DummyClassifier(strategy='most_frequent', random_state=42)
     
-    # ۳. تعریف مدل‌های اصلی (Random Forest و SVM)
+    # 3. Define main models
     rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
-    svm_model = SVC(kernel='rbf', probability=True, random_state=42) # probability برای محاسبه معیارهای پیشرفته مثل ROC
+    svm_model = SVC(kernel='rbf', probability=True, random_state=42)
     
-    # ۴. آموزش (Train) مدل‌ها
-    print("[~] Training Baseline (Dummy) Model...")
+    # 4. Train models
+    print("Training Baseline (Dummy) Model...")
     baseline_model.fit(X_train, y_train)
     
-    print("[~] Training Random Forest Model...")
+    print("Training Random Forest Model...")
     rf_model.fit(X_train, y_train)
     
-    print("[~] Training Support Vector Machine (SVM) Model...")
+    print("Training Support Vector Machine (SVM) Model...")
     svm_model.fit(X_train, y_train)
     
-    # ۵. ذخیره کردن مدل‌های آموزش‌دیده برای مرحله ارزیابی
+    # 5. Save trained models
     models = {
         'baseline': baseline_model,
         'random_forest': rf_model,
@@ -41,8 +41,4 @@ def train_models(processed_dir_path):
         with open(model_path, 'wb') as f:
             pickle.dump(model, f)
             
-    print("[✓] All models trained and saved successfully in data/processed/")
-
-if __name__ == "__main__":
-    # تست اجرای فایل به صورت مستقیم
-    train_models("data/processed")
+    print("All models trained and saved successfully in data/processed/")
