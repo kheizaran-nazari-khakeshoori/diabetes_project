@@ -36,3 +36,5 @@ python main.py
 ```
 
 The cleaned file will be saved to `data/processed/diabetes_cleaned.csv`.
+
+The pipeline also generates plots in `report/plots/`, including class distribution, feature correlation, and model performance charts.

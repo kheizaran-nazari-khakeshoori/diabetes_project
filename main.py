@@ -4,6 +4,7 @@ from src.feature_scaling import scale_features
 from src.feature_selection import select_features
 from src.model_training import train_models
 from src.final_evaluation import evaluate_models
+from src.visualization import create_data_visualizations, plot_model_metrics
 
 def main():
     RAW_DATA_PATH = os.path.join("data", "raw", "diabetes.csv")
@@ -16,6 +17,7 @@ def main():
     raw_df = load_data(RAW_DATA_PATH)
     cleaned_df = clean_data(raw_df)
     save_cleaned_data(cleaned_df, CLEANED_DATA_PATH)
+    create_data_visualizations(cleaned_df, os.path.join("report", "plots"))
     print("-" * 40)
     
     # Step 2: Feature Scaling
@@ -31,7 +33,8 @@ def main():
     print("-" * 40)
     
     # Step 5: Model Evaluation
-    evaluate_models(PROCESSED_DIR_PATH)
+    metrics = evaluate_models(PROCESSED_DIR_PATH)
+    plot_model_metrics(metrics, os.path.join("report", "plots"))
     
     print("\n--- Pipeline Executed Successfully! All Done! ---")
 
